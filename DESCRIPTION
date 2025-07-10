@@ -1,0 +1,33 @@
+Package: deweatherXGB
+Type: Package
+Title: Remove the influence of weather on air quality data (xgboost)
+Version: 0.1.0
+Authors@R: c(
+    person(
+      "David", "Carslaw",
+      email = "david.carslaw@york.ac.uk",
+      role = "aut", comment = c(ORCID = "0000-0003-0991-950X")
+    ),
+    person("Doug", "Gregg",
+    email = "djg46@leicester.ac.uk",
+    role = c("aut", "cre"))
+  )
+Description: Model and account for (or remove) the effect of meteorology
+    on atmospheric composition data. The technique uses boosted regression
+    trees based on the xgboost package. Code can also be run using multiple
+    cores if available.
+License: MIT + file LICENSE
+Encoding: UTF-8
+RoxygenNote: 7.3.2
+Imports: 
+    cli,
+    DescTools,
+    doParallel,
+    dplyr,
+    foreach,
+    lubridate,
+    pdp,
+    purrr,
+    rlang,
+    tidyr,
+    xgboost
