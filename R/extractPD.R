@@ -6,6 +6,7 @@
 #' @param n.core n.core
 #'
 #' @importFrom parallel makeCluster stopCluster
+#' @importFrom doParallel registerDoParallel
 #' @importFrom pdp partial
 #'
 #' @export
@@ -56,8 +57,7 @@ extractPD <- function(vars, mod, x, n.core){
                      pred.var = vars,
                      train = x,
                      type = "regression",
-                     grid.resolution = n,
-                     parallel = TRUE)
+                     grid.resolution = n)
     } else {
 
       res <- partial(object = mod,
@@ -65,7 +65,6 @@ extractPD <- function(vars, mod, x, n.core){
                      train = x,
                      type = "regression",
                      grid.resolution = n,
-                     parallel = TRUE,
                      pred.grid = pred.grid)
     }
   }
