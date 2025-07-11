@@ -4,7 +4,7 @@
 \alias{extractPD}
 \title{extractPD}
 \usage{
-extractPD(vars, mod, x, n.core)
+extractPD(vars, mod, x, n.core, type)
 }
 \arguments{
 \item{vars}{vars}
@@ -14,6 +14,8 @@ extractPD(vars, mod, x, n.core)
 \item{x}{x}
 
 \item{n.core}{n.core}
+
+\item{type}{type}
 }
 \description{
 extractPD

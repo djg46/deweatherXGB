@@ -95,7 +95,8 @@ buildMod <- function(
       subsample = subsample,
       colsample_bytree = colsample_bytree,
       seed = seed,
-      n.core = n.core
+      n.core = n.core,
+      type = type
     )
   }
 

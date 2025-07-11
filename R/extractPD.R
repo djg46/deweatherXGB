@@ -4,6 +4,7 @@
 #' @param mod mod
 #' @param x x
 #' @param n.core n.core
+#' @param type type
 #'
 #' @importFrom parallel makeCluster stopCluster
 #' @importFrom doParallel registerDoParallel
@@ -11,7 +12,7 @@
 #'
 #' @export
 #'
-extractPD <- function(vars, mod, x, n.core){
+extractPD <- function(vars, mod, x, n.core, type){
 
   if(vars == "hour"){
     n <- 24
@@ -26,7 +27,7 @@ extractPD <- function(vars, mod, x, n.core){
 
   if(n.core != 1){
 
-    cl <- makeCluster(n.core)
+    cl <- makeCluster(n.core, type = type)
 
     registerDoParallel(cl)
 

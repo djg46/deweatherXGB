@@ -15,6 +15,7 @@
 #' @param colsample_bytree colsample_bytree
 #' @param seed seed
 #' @param n.core n.core
+#' @param type type
 #'
 #' @importFrom xgboost xgboost xgb.importance xgb.plot.importance
 #'
@@ -36,7 +37,8 @@ runXGB <-
     subsample = subsample,
     colsample_bytree = colsample_bytree,
     seed = seed,
-    n.core = n.core
+    n.core = n.core,
+    type = type
   ) {
 
     # these models for AQ data are not very sensitive to tree sizes > 1000
@@ -71,7 +73,7 @@ runXGB <-
                    nrounds = nrounds)
 
     ## extract partial dependence components
-    pd <- purrr::map(vars, extractPD, mod = mod, x = x, n.core = n.core) %>%
+    pd <- purrr::map(vars, extractPD, mod = mod, x = x, n.core = n.core, type = type) %>%
       purrr::map(
         ~ dplyr::nest_by(.x, var, var_type) %>%
           tidyr::pivot_wider(
