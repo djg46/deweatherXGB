@@ -20,7 +20,7 @@
 #' @import dplyr
 #' @importFrom rlang .data
 #' @importFrom stats reorder
-#' @importFrom foreach %dopar%
+#' @importFrom foreach %do%
 #'
 #' @export
 #'
