@@ -69,15 +69,42 @@ partialDep <-
         n.core = n.core
       )
     } else {
-      cl <- parallel::makeCluster(n.core, type = type)
-      doParallel::registerDoParallel(cl)
+    #   cl <- parallel::makeCluster(n.core, type = type)
+    #   doParallel::registerDoParallel(cl)
+    #
+    #   pred <- foreach::foreach(
+    #     i = 1:B,
+    #     .inorder = FALSE,
+    #     .packages = "xgboost",
+    #     .export = "runXGB"
+    #   ) %dopar%
+    #     runXGB(
+    #       dat,
+    #       vars,
+    #       return.mod = FALSE,
+    #       simulate = TRUE,
+    #       nrounds = nrounds,
+    #       eta = eta,
+    #       max_depth = max_depth,
+    #       min_child_weight = min_child_weight,
+    #       gamma = gamma,
+    #       lambda = lambda,
+    #       alpha = alpha,
+    #       subsample = subsample,
+    #       colsample_bytree = colsample_bytree,
+    #       seed = seed,
+    #       n.core = 1
+    #     )
+    #
+    #   parallel::stopCluster(cl)
+    # }
 
       pred <- foreach::foreach(
         i = 1:B,
         .inorder = FALSE,
         .packages = "xgboost",
         .export = "runXGB"
-      ) %dopar%
+      ) %do%
         runXGB(
           dat,
           vars,
@@ -93,11 +120,10 @@ partialDep <-
           subsample = subsample,
           colsample_bytree = colsample_bytree,
           seed = seed,
-          n.core = 1
+          n.core = n.core,
+          type = type
         )
-
-      parallel::stopCluster(cl)
-    }
+      }
 
     # partial dependence plots
 
