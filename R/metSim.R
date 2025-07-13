@@ -8,6 +8,7 @@
 #'
 #' @importFrom xgboost getinfo
 #' @importFrom rlang :=
+#' @importFrom foreach %dopar%
 #'
 #' @export
 #'
