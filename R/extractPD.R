@@ -14,9 +14,15 @@
 #'
 extractPD <- function(vars, mod, x, n.core, type){
 
-  if(vars == "hour"){
+  if(vars %in% c("hour_sin", "hour_cos")){
     n <- 24
-  } else{
+  } else if(vars == "week"){
+    n <- max(x[[vars]])
+  } else if(vars %in% c("wd_sin", "wd_cos")) {
+    n <- 36
+  } else if(vars %in% c("air_temp", "ws")){
+    n <- 50
+  } else {
     n <- 100
   }
 
