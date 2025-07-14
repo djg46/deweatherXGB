@@ -44,7 +44,8 @@ extractPD <- function(vars, mod, x, n.core, type){
                      train = x,
                      type = "regression",
                      grid.resolution = n,
-                     parallel = TRUE)
+                     parallel = TRUE,
+                     paropts = list(.packages = "xgboost"))
     } else {
 
       res <- partial(object = mod,
@@ -53,7 +54,8 @@ extractPD <- function(vars, mod, x, n.core, type){
                      type = "regression",
                      grid.resolution = n,
                      parallel = TRUE,
-                     pred.grid = pred.grid)
+                     pred.grid = pred.grid,
+                     paropts = list(.packages = "xgboost"))
     }
 
     stopCluster(cl)
@@ -64,7 +66,8 @@ extractPD <- function(vars, mod, x, n.core, type){
                      pred.var = vars,
                      train = x,
                      type = "regression",
-                     grid.resolution = n)
+                     grid.resolution = n,
+                     paropts = list(.packages = "xgboost"))
     } else {
 
       res <- partial(object = mod,
@@ -72,7 +75,8 @@ extractPD <- function(vars, mod, x, n.core, type){
                      train = x,
                      type = "regression",
                      grid.resolution = n,
-                     pred.grid = pred.grid)
+                     pred.grid = pred.grid,
+                     paropts = list(.packages = "xgboost"))
     }
   }
 
