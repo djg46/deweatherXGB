@@ -50,7 +50,7 @@ runXGB <-
     if (!simulate) {
       set.seed(seed)
     } else {
-      set.seed(stats::runif(1))
+      set.seed(stats::runif(1, 0, 10000))
     }
 
     ## sub-sample the data for bootstrapping
