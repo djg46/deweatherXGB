@@ -153,6 +153,12 @@ runXGB <-
 
       pd[[k]] <- grid %>% filter(var == vars[k])
 
+      if(is.numeric(x[[vars[k]]])){
+
+        pd[[k]]$x <- as.numeric(pd[[k]]$x)
+
+      }
+
     }
 
     pd <- pd %>% purrr::map(
