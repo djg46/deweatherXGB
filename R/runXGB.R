@@ -19,6 +19,7 @@
 #'
 #' @importFrom xgboost xgboost xgb.importance xgb.plot.importance
 #' @importFrom foreach foreach
+#' @importFrom data.table rbindlist
 #'
 #' @export
 #'
@@ -42,7 +43,7 @@ runXGB <-
     type = type
   ) {
 
-    i <- NULL
+    i <- var <- NULL
 
     # these models for AQ data are not very sensitive to tree sizes > 1000
     # make reproducible
@@ -77,60 +78,82 @@ runXGB <-
 
     ## extract partial dependence components
 
-    cl <- makeCluster(n.core, type = type)
-
-    registerDoParallel(cl)
-
-    pd <- foreach(i = 1:length(vars)) %dopar% {
+    grid <- foreach(i = 1:length(vars)) %do% {
 
       if(is.numeric(x[[vars[i]]])){
 
         if(vars[i] %in% c("hour_sin", "hour_cos")){
-          resolution <- 24
+          resolution <- 25
         } else if(vars[i] == "week"){
-          resolution <- max(x[[vars[i]]])
+          resolution <- max(x[[vars[i]]] + 1)
         } else if(vars[i] %in% c("wd_sin", "wd_cos")) {
-          resolution <- 36
+          resolution <- 37
         } else if(vars[i] %in% c("air_temp", "ws")){
           resolution <- 50
         } else {
           resolution <- 100
         }
 
-        grid <- seq(from = min(x[[vars[i]]], na.rm = TRUE),
-                    to = max(x[[vars[i]]], na.rm = TRUE),
-                    length = resolution)
+        ret <- as.data.frame(seq(from = min(x[[vars[i]]], na.rm = TRUE),
+                                 to = max(x[[vars[i]]], na.rm = TRUE),
+                                 length = resolution))
 
       } else {
 
-        grid <- levels(x[[vars[i]]])
+        ret <- as.data.frame(levels(x[[vars[i]]]))
       }
 
-      grid <- expand.grid(grid)
+      names(ret) <- "x"
 
-      names(grid) <- vars[i]
+      ret$var <- vars[i]
 
-      grid$pred <- 1
+      ret$var_type <- ifelse(is.numeric(x[[vars[i]]]), "numeric", "factor")
 
-      for(j in 1:nrow(grid)){
+      return(ret)
 
-        temp <- x
+    }
 
-        temp[, vars[i]] <- grid[j, 1]
+    grid <- rbindlist(grid)
 
-        grid$pred[j] <- mean(predict(mod, temp))
+    grid$y <- 1
+
+    cl <- makeCluster(n.core, type = type)
+
+    registerDoParallel(cl)
+
+    out <- foreach(i = 1:nrow(grid)) %dopar% {
+
+      temp <- x
+
+      if(grid$var_type[i] == "numeric"){
+
+        temp[, grid$var[i]] <- grid$x[i]
+
+      } else {
+
+        temp[, grid$var[i]] <- factor(grid$x[i], levels = levels(temp[[grid$var[i]]]))
       }
 
-      res <- data.frame(y = grid$pred,
-                        var = vars[i],
-                        x = grid[[vars[i]]],
-                        var_type = ifelse(is.numeric(x[[vars[i]]]), "numeric", "factor")
-      )
+      out <- mean(predict(mod, temp))
 
-      return(res)
+      return(out)
     }
 
     stopCluster(cl)
+
+    for(j in 1:length(out)){
+
+      grid$y[j] <- out[[j]]
+
+    }
+
+    pd <- list()
+
+    for(k in 1:length(vars)){
+
+      pd[[k]] <- grid %>% filter(var == vars[k])
+
+    }
 
     pd <- pd %>% purrr::map(
       ~ dplyr::nest_by(.x, var, var_type) %>%
