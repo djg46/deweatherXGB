@@ -5,6 +5,7 @@
 #' @param metVars metVars (excl. trend)
 #' @param n.core n.core
 #' @param B B
+#' @param type type
 #'
 #' @importFrom xgboost getinfo
 #' @importFrom rlang :=
@@ -18,7 +19,8 @@ metSim <-
     newdata,
     metVars = c("ws", "wd", "air_temp"),
     n.core = 4,
-    B = 200
+    B = 200,
+    type = "PSOCK"
   ) {
     if (!inherits(dw_model, "deweather")) {
       cli::cli_abort(
@@ -50,7 +52,8 @@ metSim <-
       newdata <- prepData(newdata)
     }
 
-    cl <- parallel::makeCluster(n.core)
+    cl <- parallel::makeCluster(n.core, type = type)
+
     doParallel::registerDoParallel(cl)
 
     prediction <- foreach::foreach(

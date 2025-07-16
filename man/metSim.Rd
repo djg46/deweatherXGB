@@ -9,7 +9,8 @@ metSim(
   newdata,
   metVars = c("ws", "wd", "air_temp"),
   n.core = 4,
-  B = 200
+  B = 200,
+  type = "PSOCK"
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ metSim(
 \item{n.core}{n.core}
 
 \item{B}{B}
+
+\item{type}{type}
 }
 \description{
 metSim
