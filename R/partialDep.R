@@ -166,7 +166,7 @@ partialDep <-
           purrr::possibly(
             ~ dplyr::mutate(
               .x,
-              x_bin = cut(.data$x, nrow(.data) / B, include.lowest = TRUE)
+              x_bin = cut(.data$x, nrow(.x) / B, include.lowest = TRUE)
             ) %>%
               dplyr::group_by(x_bin) %>%
               dplyr::summarise(
