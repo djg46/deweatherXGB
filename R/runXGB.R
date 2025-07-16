@@ -18,6 +18,7 @@
 #' @param type type
 #'
 #' @importFrom xgboost xgboost xgb.importance xgb.plot.importance
+#' @importFrom foreach foreach
 #'
 #' @export
 #'
@@ -40,6 +41,8 @@ runXGB <-
     n.core = n.core,
     type = type
   ) {
+
+    i <- NULL
 
     # these models for AQ data are not very sensitive to tree sizes > 1000
     # make reproducible
@@ -73,14 +76,69 @@ runXGB <-
                    nrounds = nrounds)
 
     ## extract partial dependence components
-    pd <- purrr::map(vars, extractPD, mod = mod, x = x, n.core = n.core, type = type) %>%
-      purrr::map(
-        ~ dplyr::nest_by(.x, var, var_type) %>%
-          tidyr::pivot_wider(
-            names_from = "var_type",
-            values_from = "data"
-          )
-      ) %>%
+
+    cl <- makeCluster(n.core, type = type)
+
+    registerDoParallel(cl)
+
+    pd <- foreach(i = 1:length(vars)) %dopar% {
+
+      if(is.numeric(x[[vars[i]]])){
+
+        if(vars[i] %in% c("hour_sin", "hour_cos")){
+          resolution <- 24
+        } else if(vars[i] == "week"){
+          resolution <- max(x[[vars[i]]])
+        } else if(vars[i] %in% c("wd_sin", "wd_cos")) {
+          resolution <- 36
+        } else if(vars[i] %in% c("air_temp", "ws")){
+          resolution <- 50
+        } else {
+          resolution <- 100
+        }
+
+        grid <- seq(from = min(x[[vars[i]]], na.rm = TRUE),
+                    to = max(x[[vars[i]]], na.rm = TRUE),
+                    length = resolution)
+
+      } else {
+
+        grid <- levels(x[[vars[i]]])
+      }
+
+      grid <- expand.grid(grid)
+
+      names(grid) <- vars[i]
+
+      grid$pred <- 1
+
+      for(j in 1:nrow(grid)){
+
+        temp <- x
+
+        temp[, vars[i]] <- grid[j, 1]
+
+        grid$pred[j] <- mean(predict(mod, temp))
+      }
+
+      res <- data.frame(y = grid$pred,
+                        var = vars[i],
+                        x = grid[[vars[i]]],
+                        var_type = ifelse(is.numeric(x[[vars[i]]]), "numeric", "factor")
+      )
+
+      return(res)
+    }
+
+    stopCluster(cl)
+
+    pd <- pd %>% purrr::map(
+      ~ dplyr::nest_by(.x, var, var_type) %>%
+        tidyr::pivot_wider(
+          names_from = "var_type",
+          values_from = "data"
+        )
+    ) %>%
       dplyr::bind_rows()
 
     ## relative influence
