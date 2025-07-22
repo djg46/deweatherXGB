@@ -26,6 +26,7 @@ Imports:
     doParallel,
     dplyr,
     foreach,
+    furrr,
     lubridate,
     pdp,
     purrr,

@@ -20,6 +20,7 @@
 #' @importFrom xgboost xgboost xgb.importance xgb.plot.importance
 #' @importFrom foreach foreach
 #' @importFrom data.table rbindlist
+#' @importFrom furrr future_pmap_dbl
 #'
 #' @export
 #'
@@ -115,37 +116,7 @@ runXGB <-
 
     grid <- rbindlist(grid)
 
-    grid$y <- 1
-
-    cl <- makeCluster(n.core, type = type)
-
-    registerDoParallel(cl)
-
-    out <- foreach(i = 1:nrow(grid)) %dopar% {
-
-      temp <- x
-
-      if(grid$var_type[i] == "numeric"){
-
-        temp[, grid$var[i]] <- grid$x[i]
-
-      } else {
-
-        temp[, grid$var[i]] <- factor(grid$x[i], levels = levels(temp[[grid$var[i]]]))
-      }
-
-      out <- mean(predict(mod, temp))
-
-      return(out)
-    }
-
-    stopCluster(cl)
-
-    for(j in 1:length(out)){
-
-      grid$y[j] <- out[[j]]
-
-    }
+    grid$y <- future_pmap_dbl(grid, getPD, x = x, mod = mod)
 
     pd <- list()
 
@@ -160,7 +131,6 @@ runXGB <-
       }
 
     }
-
     pd <- pd %>% purrr::map(
       ~ dplyr::nest_by(.x, var, var_type) %>%
         tidyr::pivot_wider(
