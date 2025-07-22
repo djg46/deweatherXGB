@@ -22,7 +22,7 @@ buildMod(
   colsample_bytree = colsample_bytree,
   seed = seed,
   n.core = n.core,
-  type = "PSOCK"
+  type = "multisession"
 )
 }
 \arguments{
@@ -60,7 +60,7 @@ buildMod(
 
 \item{n.core}{n.core}
 
-\item{type}{type}
+\item{type}{type multisession = SOCK, multicore = FORK}
 }
 \description{
 buildMod

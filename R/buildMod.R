@@ -17,9 +17,10 @@
 #' @param colsample_bytree colsample_bytree
 #' @param seed seed
 #' @param n.core n.core
-#' @param type type
+#' @param type type multisession = SOCK, multicore = FORK
 #'
 #' @importFrom tidyr all_of
+#' @importFrom future plan
 #'
 #' @export
 #'
@@ -48,8 +49,11 @@ buildMod <- function(
     colsample_bytree = colsample_bytree,
     seed = seed,
     n.core = n.core,
-    type = "PSOCK"
+    type = "multisession"
 ) {
+
+  plan(strategy = type, workers = n.core)
+
   ## add other variables, select only those required for modelling
   input_data <- prepData(input_data)
   input_data <-

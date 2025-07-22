@@ -27,6 +27,7 @@ Imports:
     dplyr,
     foreach,
     furrr,
+    future,
     lubridate,
     pdp,
     purrr,
