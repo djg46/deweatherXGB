@@ -4,7 +4,7 @@
 \alias{doPred}
 \title{doPred}
 \usage{
-doPred(mydata, mod, metVars)
+doPred(mydata = mydata, mod = mod, metVars = metVars)
 }
 \arguments{
 \item{mydata}{data}

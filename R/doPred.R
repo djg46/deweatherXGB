@@ -8,7 +8,7 @@
 #'
 #' @export
 #'
-doPred <- function(mydata, mod, metVars) {
+doPred <- function(mydata = mydata, mod = mod, metVars = metVars) {
   ## random samples
   n <- nrow(mydata)
   id <- sample(1:n, n, replace = FALSE)
