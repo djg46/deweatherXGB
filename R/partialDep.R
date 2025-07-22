@@ -101,10 +101,7 @@ partialDep <-
 
       pred <- foreach::foreach(
         i = 1:B,
-        .inorder = FALSE,
-        .packages = "xgboost",
-        .export = "runXGB"
-      ) %do%
+        .inorder = FALSE) %do%
         runXGB(
           dat,
           vars,
