@@ -3,6 +3,7 @@
 export(buildMod)
 export(doPred)
 export(extractPD)
+export(getPD)
 export(metSim)
 export(partialDep)
 export(prepData)
