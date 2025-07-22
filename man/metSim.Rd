@@ -10,7 +10,7 @@ metSim(
   metVars = c("ws", "wd", "air_temp"),
   n.core = 4,
   B = 200,
-  type = "PSOCK"
+  type = "multisession"
 )
 }
 \arguments{
@@ -24,7 +24,7 @@ metSim(
 
 \item{B}{B}
 
-\item{type}{type}
+\item{type}{type multisession = SOCK, multicore = FORK}
 }
 \description{
 metSim

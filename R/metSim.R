@@ -5,11 +5,12 @@
 #' @param metVars metVars (excl. trend)
 #' @param n.core n.core
 #' @param B B
-#' @param type type
+#' @param type type multisession = SOCK, multicore = FORK
 #'
 #' @importFrom xgboost getinfo
 #' @importFrom rlang :=
-#' @importFrom foreach %dopar%
+#' @importFrom future plan
+#' @importFrom furrr future_map_dfr furrr_options
 #'
 #' @export
 #'
@@ -20,7 +21,7 @@ metSim <-
     metVars = c("ws", "wd", "air_temp"),
     n.core = 4,
     B = 200,
-    type = "PSOCK"
+    type = "multisession"
   ) {
     if (!inherits(dw_model, "deweather")) {
       cli::cli_abort(
@@ -31,6 +32,10 @@ metSim <-
         call = NULL
       )
     }
+
+    . <- NULL
+
+    plan(strategy = type, workers = n.core)
 
     ## extract the model
     mod <- dw_model$model
@@ -52,20 +57,11 @@ metSim <-
       newdata <- prepData(newdata)
     }
 
-    cl <- parallel::makeCluster(n.core, type = type)
-
-    doParallel::registerDoParallel(cl)
-
-    prediction <- foreach::foreach(
-      i = 1:B,
-      .inorder = FALSE,
-      .combine = "rbind",
-      .packages = "gbm",
-      .export = "doPred"
-    ) %dopar%
-      doPred(newdata, mod, metVars)
-
-    parallel::stopCluster(cl)
+    prediction <- 1:B %>% future_map_dfr(.,
+                                         ~ doPred(mydata = newdata,
+                                                  mod = mod,
+                                                  metVars = metVars),
+                                         .options = furrr_options(seed = TRUE))
 
     # use pollutant name
     names(prediction)[2] <- pollutant
@@ -74,9 +70,7 @@ metSim <-
     prediction <- dplyr::group_by(prediction, .data$date) %>%
       dplyr::summarise({{ pollutant }} := mean(.data[[pollutant]]))
 
+    plan("sequential")
+
     return(dplyr::tibble(prediction))
   }
-
-
-## randomly sample from original data
-
