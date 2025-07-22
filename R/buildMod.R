@@ -140,5 +140,7 @@ buildMod <- function(
     )
   class(result) <- "deweather"
 
+  plan("sequential")
+
   return(result)
 }
