@@ -104,7 +104,7 @@ runXGB <-
         ret <- as.data.frame(levels(x[[vars[i]]]))
       }
 
-      names(ret) <- "x"
+      names(ret) <- "predictor"
 
       ret$var <- vars[i]
 
