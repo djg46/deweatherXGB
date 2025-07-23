@@ -116,7 +116,8 @@ runXGB <-
 
     grid <- rbindlist(grid)
 
-    grid$y <- future_pmap_dbl(grid, getPD, x = x, mod = mod)
+    grid$y <- future_pmap_dbl(grid, getPD, x = x, mod = mod,
+                              .options = furrr_options(seed = TRUE))
 
     pd <- list()
 
