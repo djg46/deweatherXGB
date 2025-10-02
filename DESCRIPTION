@@ -18,7 +18,7 @@ Description: Model and account for (or remove) the effect of meteorology
     cores if available.
 License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Imports: 
     cli,
     data.table,

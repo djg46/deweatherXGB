@@ -127,9 +127,11 @@ runXGB <-
 
       if(is.numeric(x[[vars[k]]])){
 
-        pd[[k]]$x <- as.numeric(pd[[k]]$x)
+        pd[[k]]$predictor <- as.numeric(pd[[k]]$predictor)
 
       }
+
+      pd[[k]] <- pd[[k]] %>% rename("x" = "predictor")
 
     }
     pd <- pd %>% purrr::map(
